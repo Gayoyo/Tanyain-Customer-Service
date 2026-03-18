@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chatbot - Tanyain</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Pakai versi CSS FontAwesome, bukan JS (hindari CORS) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <style>
+    :root {
+      --bg-primary: #ffffff;
+      --bg-secondary: #f9fafb;
+      --text-primary: #1f2937;
+      --text-secondary: #6b7280;
+      --border-color: #e5e7eb;
+      --chat-user-bg: #d1f7d1;
+      --chat-bot-bg: #eef2ff;
+    }
+
+    [data-theme="dark"] {
+      --bg-primary: #1f2937;
+      --bg-secondary: #111827;
+      --text-primary: #f9fafb;
+      --text-secondary: #d1d5db;
+      --border-color: #374151;
+      --chat-user-bg: #065f46;
+      --chat-bot-bg: #1e3a8a;
+    }
+
+    body {
+      background-color: var(--bg-secondary);
+      color: var(--text-primary);
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .chat-container {
+      width: 90%;
+      max-width: 700px;
+      margin: 40px auto;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+      background: var(--bg-primary);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      height: 80vh;
+      transition: background-color 0.3s ease;
+    }
+
+    .chat-header {
+      padding: 16px;
+      font-size: 20px;
+      font-weight: bold;
+      color: #5f5fff;
+      border-bottom: 1px solid var(--border-color);
+      text-align: center;
+      background: var(--bg-primary);
+      position: relative;
+    }
+
+    .theme-toggle {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      font-size: 18px;
+      cursor: pointer;
+      color: var(--text-secondary);
+      transition: color 0.3s ease;
+    }
+
+    .theme-toggle:hover {
+      color: var(--text-primary);
+    }
+
+    .chat-box {
+      flex: 1;
+      padding: 16px 24px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .chat-box::-webkit-scrollbar {
+      width: 8px;
+    }
+    .chat-box::-webkit-scrollbar-thumb {
+      background-color: #94a3b8 ; /* ungu lembut */
+      border-radius: 4px;
+    }
+    .chat-box::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    
+    .chat-message {
+      max-width: 70%;
+      padding: 12px 16px;
+      border-radius: 20px;
+      font-size: 15px;
+      line-height: 1.4;
+    }
+
+    .chat-message.bot {
+      background-color: var(--chat-bot-bg);
+      align-self: flex-start;
+      color: var(--text-primary);
+    }
+
+    .chat-message.user {
+      background-color: var(--chat-user-bg);
+      align-self: flex-end;
+      color: var(--text-primary);
+    }
+
+    .chat-input {
+      display: flex;
+      border-top: 1px solid var(--border-color);
+      padding: 12px;
+      background: var(--bg-primary);
+    }
+
+    .chat-input input {
+      flex: 1;
+      border: none;
+      border-radius: 999px;
+      padding: 10px 16px;
+      font-size: 15px;
+      outline: none;
+      background-color: var(--bg-secondary);
+      color: var(--text-primary);
+    }
+
+    .chat-input input::placeholder {
+      color: var(--text-secondary);
+    }
+
+    .typing {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-left: 10px;
+      background: var(--bg-primary);
+    }
+
+    .typing-dots {
+      display: flex;
+      gap: 4px;
+    }
+
+    .typing-dots span {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: var(--text-secondary);
+      animation: typing 1.4s infinite ease-in-out;
+    }
+
+    .typing-dots span:nth-child(1) { animation-delay: -0.32s; }
+    .typing-dots span:nth-child(2) { animation-delay: -0.16s; }
+
+    @keyframes typing {
+      0%, 80%, 100% { transform: scale(0); }
+      40% { transform: scale(1); }
+    }
+
+    .suggestions {
+      background: var(--bg-primary);
+      border-top: 1px solid var(--border-color);
+    }
+
+    .suggestion-btn {
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+      padding: 6px 12px;
+      border-radius: 16px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .suggestion-btn:hover {
+      background: #5f5fff;
+      color: white;
+      transform: translateY(-1px);
+    }
+  </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+
+  <div class="chat-container">
+    <div class="chat-header flex items-center justify-center gap-3">
+      <img src="{{ url_for('static', filename='img/Tanyain.png') }}" class="h-10 w-10 rounded-full shadow" alt="Logo">
+      <span>Daviena AI Assistant</span>
+      <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark Mode">
+        <i class="fas fa-moon" id="theme-icon"></i>
+      </button>
+    </div>
+
+    <div class="chat-box" id="chat-box">
+      <!-- Chat bubbles akan muncul di sini -->
+    </div>
+
+    <div id="typing" class="typing hidden flex items-center gap-2 px-4 py-2">
+      <div class="typing-dots">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+      <span>Sedang mengetik...</span>
+    </div>
+
+    <!-- Quick Suggestions -->
+    <div id="suggestions" class="suggestions px-4 py-2 border-t border-gray-200">
+      <div class="flex gap-2 flex-wrap">
+        <button class="suggestion-btn" onclick="sendSuggestion('Apa itu chatbot?')">[Cek Resi Shopee]</button>
+        <button class="suggestion-btn" onclick="sendSuggestion('Bagaimana cara kerja sistem ini?')">[Stok Promo Lebaran]</button>
+        <button class="suggestion-btn" onclick="sendSuggestion('Bantuan')">[Jadwal Kirim Terakhir]</button>
+      </div>
+    </div>
+
+    <div class="chat-input">
+      <input type="text" id="user-input" placeholder="Ketik pesan atau pilih saran di atas..." autocomplete="off" />
+      <button id="send-btn"><i class="fas fa-paper-plane"></i></button>
+    </div>
+  </div>
+  <script>
+      const chatBox = document.getElementById('chat-box');
+      const input = document.getElementById('user-input');
+      const sendBtn = document.getElementById('send-btn');
+      const typingIndicator = document.getElementById('typing');
+      const sessionId = localStorage.getItem('chat_session_id') || crypto.randomUUID();
+      localStorage.setItem('chat_session_id', sessionId);
+      const themeIcon = document.getElementById('theme-icon');
+      let currentTheme = localStorage.getItem('theme') || 'light';
+
+      // === VARIABEL BARU UNTUK FLOW ORDER ===
+      let chatState = {
+          inOrderFlow: false,
+          step: 0,
+          data: {} // Menyimpan data order sementara (e.g., {product: 'Sepatu', qty: 2})
+      };
+
+      // Kata kunci sederhana untuk memicu alur order
+      const ORDER_KEYWORDS = ["order", "pesan", "beli", "mau"]; 
+
+      // Daftar pertanyaan terstruktur
+      const ORDER_QUESTIONS = [
+          "Baik, Anda ingin melakukan order. Produk apa yang Anda inginkan? (Contoh: Sepatu A, Kaos B)", // Step 1
+          "Terima kasih. Berapa jumlah (Qty) yang Anda butuhkan?", // Step 2
+          "Apakah ada spesifikasi tambahan yang penting? (Contoh: Warna Hitam, Ukuran XL)", // Step 3
+          "Order sudah lengkap. Ketik **'Ya, Kirim'** untuk mengirim data ke sistem. Atau ketik **'Batal'** untuk membatalkan." // Step 4 (Konfirmasi)
+      ];
+      // =====================================
+
+      function setTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem('theme', theme);
+        currentTheme = theme;
+
+        if (theme === 'dark') {
+          themeIcon.classList.remove('fa-moon');
+          themeIcon.classList.add('fa-sun');
+        } else {
+          themeIcon.classList.remove('fa-sun');
+          themeIcon.classList.add('fa-moon');
+        }
+      }
+
+      // Initialize theme on page load
+      setTheme(currentTheme);
+
+      function toggleTheme() {
+        setTheme(currentTheme === 'light' ? 'dark' : 'light');
+      }
+
+      function addMessage(text, isUser = false) {
+        const div = document.createElement('div');
+        div.className = `chat-message ${isUser ? 'user' : 'bot'}`;
+        div.innerHTML = text.replace(/\n/g, '<br>'); // Mengganti \n menjadi <br>
+        chatBox.appendChild(div);
+        chatBox.scrollTop = chatBox.scrollHeight;
+      }
+
+      function resetOrderFlow() {
+          chatState.inOrderFlow = false;
+          chatState.step = 0;
+          chatState.data = {};
+      }
+
+      async function submitOrderData() {
+          // Panggil endpoint FLASK BARU: /submit_order
+          typingIndicator.classList.remove('hidden');
+
+          try {
+              const res = await fetch('/submit_order', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ 
+                      product_type: chatState.data.product,
+                      qty_final: chatState.data.qty,
+                      order_specs: chatState.data.specs 
+                  })
+              });
+              const data = await res.json();
+
+              if (data.status === 'success') {
+                  addMessage(`✅ ${data.message} Data Order Anda berhasil dikirim ke sistem (SSOT/Airtable).`, false);
+              } else {
+                  addMessage(`⚠️ **Order Gagal Terkirim:** ${data.message}`, false);
+              }
+
+              // Reset state setelah pengiriman
+              resetOrderFlow(); 
+
+          } catch (err) {
+              addMessage("Terjadi kesalahan koneksi saat mengirim Order ke server. Coba lagi atau hubungi admin.", false);
+          }
+
+          typingIndicator.classList.add('hidden');
+      }
+
+      function processOrderFlow(text) {
+          text = text.toLowerCase().trim();
+
+          if (text === 'batal') {
+              addMessage("Proses Order dibatalkan. Ada yang bisa saya bantu lagi?", false);
+              resetOrderFlow();
+              return;
+          }
+
+          if (chatState.step === 0) {
+              // Ini seharusnya tidak terjadi jika inOrderFlow sudah true, tapi sebagai safety
+              chatState.inOrderFlow = true;
+              chatState.step = 1;
+              addMessage(ORDER_QUESTIONS[0], false);
+
+          } else if (chatState.step === 1) {
+              // Simpan Produk
+              chatState.data.product = text;
+              chatState.step = 2;
+              addMessage(`Anda memilih **${text}**. ${ORDER_QUESTIONS[1]}`, false);
+
+          } else if (chatState.step === 2) {
+              // Simpan Qty dan Validasi (opsional)
+              const qty = parseInt(text);
+              if (isNaN(qty) || qty <= 0) {
+                  addMessage("Jumlah harus berupa angka yang valid. Mohon masukkan Qty yang benar.", false);
+                  return;
+              }
+              chatState.data.qty = qty;
+              chatState.step = 3;
+              addMessage(ORDER_QUESTIONS[2], false);
+
+          } else if (chatState.step === 3) {
+              // Simpan Spesifikasi
+              chatState.data.specs = text;
+              chatState.step = 4;
+
+              // Tampilkan Ringkasan Order
+              let summary = "Ringkasan Order Anda:\n";
+              summary += `Produk: **${chatState.data.product}**\n`;
+              summary += `Jumlah (Qty): **${chatState.data.qty}**\n`;
+              summary += `Spesifikasi: **${chatState.data.specs}**\n\n`;
+              summary += ORDER_QUESTIONS[3]; // Konfirmasi final
+
+              addMessage(summary, false);
+
+          } else if (chatState.step === 4) {
+              // Konfirmasi Akhir
+              if (text.includes('ya') && text.includes('kirim')) {
+                  submitOrderData(); // Panggil fungsi kirim data
+              } else {
+                  addMessage("Mohon ketik **'Ya, Kirim'** untuk melanjutkan, atau **'Batal'**.", false);
+              }
+          }
+      }
+
+
+      async function sendMessage() {
+          const text = input.value.trim();
+          if (!text) return;
+
+          addMessage(text, true);
+          input.value = '';
+          typingIndicator.classList.remove('hidden');
+
+          const normalizedText = text.toLowerCase().trim();
+
+          if (chatState.inOrderFlow) {
+              // Jika sudah dalam alur order, proses data
+              processOrderFlow(text);
+              typingIndicator.classList.add('hidden');
+              return; 
+          }
+
+          // Cek apakah user MENGINGINKAN order
+          if (ORDER_KEYWORDS.some(keyword => normalizedText.includes(keyword))) {
+              // Pindah ke alur order
+              chatState.inOrderFlow = true;
+              chatState.step = 0; // Mulai dari step 0
+              processOrderFlow("trigger"); // Panggil untuk menampilkan pertanyaan pertama
+              typingIndicator.classList.add('hidden');
+              return; 
+          }
+
+          // === JIKA BUKAN ORDER, KEMBALI KE FUNGSI FAQ (TF-IDF) LAMA ===
+          try {
+              const res = await fetch('/chat', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ message: text, session_id: sessionId })
+              });
+              const data = await res.json();
+              addMessage(data.response, false);
+          } catch (err) {
+              addMessage("Terjadi kesalahan saat mengirim pesan ke Chatbot FAQ.", false);
+          }
+
+          typingIndicator.classList.add('hidden');
+      }
+
+      function sendSuggestion(text) {
+        input.value = text;
+        sendMessage();
+      }
+
+      // Sambungkan event listener
+      sendBtn.addEventListener('click', sendMessage);
+      input.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') sendMessage();
+      });
+
+      // Pesan sapaan pertama
+      addMessage("Halo Kak! Admin sedang libur Lebaran (19-24 Maret). Ada yang bisa saya bantu? Silakan tanya soal Stok Skincare, Cek Resi, atau Jadwal Pengiriman.", false);
+  </script>
+</body>
+</html>

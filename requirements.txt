@@ -1,0 +1,15 @@
+flask
+flask_sqlalchemy
+flask_cors
+scikit-learn
+requests
+werkzeug
+qrcode
+sqlalchemy
+fastapi
+numpy
+passlib
+pydantic
+pyjwt
+sentence-transformers
+uvicorn
