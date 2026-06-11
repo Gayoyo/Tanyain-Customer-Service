@@ -6,6 +6,18 @@ Platform ini mengadopsi arsitektur **Multi-Tenant**, memungkinkan banyak bisnis/
 
 ---
 
+## 📺 Demo Aplikasi (Video)
+
+Lihat bagaimana **Tanyain** bekerja secara langsung melalui video demonstrasi berikut:
+
+1. **[Demo Utama: AI Chatbot Otomatis untuk Bisnis & UMKM](https://youtu.be/n5JUtc0aTcA)**
+   *Menampilkan alur lengkap manajemen multi-tenant, upload massal FAQ via CSV, serta visualisasi dashboard analitik performa chat secara real-time.*
+
+2. **[Demo Fitur CS 24/7: Admin Mudik? Toko Tetap Jalan!](https://youtu.be/iGgr0OmKriQ)**
+   *Menampilkan simulasi bagaimana AI chatbot merespons pertanyaan pelanggan secara instan dan akurat demi menjaga operasional bisnis tanpa henti.*
+
+---
+
 ## 🌟 Fitur Utama
 
 * **Multi-Tenant Architecture:** Manajemen multi-klien berbasis *slug* dinamis dan sistem persetujuan superadmin (*Super Admin Approval*).
