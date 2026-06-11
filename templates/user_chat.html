@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Chatbot - Tanyain</title>
+  <title>AI Assistant</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Pakai versi CSS FontAwesome, bukan JS (hindari CORS) -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -195,7 +195,7 @@
   <div class="chat-container">
     <div class="chat-header flex items-center justify-center gap-3">
       <img src="{{ url_for('static', filename='img/Tanyain.png') }}" class="h-10 w-10 rounded-full shadow" alt="Logo">
-      <span>Daviena AI Assistant</span>
+      <span>AI Assistant</span>
       <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark Mode">
         <i class="fas fa-moon" id="theme-icon"></i>
       </button>
@@ -217,9 +217,9 @@
     <!-- Quick Suggestions -->
     <div id="suggestions" class="suggestions px-4 py-2 border-t border-gray-200">
       <div class="flex gap-2 flex-wrap">
-        <button class="suggestion-btn" onclick="sendSuggestion('Apa itu chatbot?')">[Cek Resi Shopee]</button>
-        <button class="suggestion-btn" onclick="sendSuggestion('Bagaimana cara kerja sistem ini?')">[Stok Promo Lebaran]</button>
-        <button class="suggestion-btn" onclick="sendSuggestion('Bantuan')">[Jadwal Kirim Terakhir]</button>
+        <button class="suggestion-btn" onclick="sendSuggestion('Cek Resi Pengiriman')">📦 Cek Resi Pengiriman</button>
+        <button class="suggestion-btn" onclick="sendSuggestion('Cek Stok Promo')">✨ Cek Stok Promo</button>
+        <button class="suggestion-btn" onclick="sendSuggestion('Mau Order Barang')">🛍️ Mau Order Barang</button>
       </div>
     </div>
 
@@ -435,8 +435,8 @@
         if (e.key === 'Enter') sendMessage();
       });
 
-      // Pesan sapaan pertama
-      addMessage("Halo Kak! Admin sedang libur Lebaran (19-24 Maret). Ada yang bisa saya bantu? Silakan tanya soal Stok Skincare, Cek Resi, atau Jadwal Pengiriman.", false);
+    // Pesan sapaan pertama
+    addMessage("Halo Kak! Selamat datang di AI Assistant. Ada yang bisa saya bantu?\n\nSilakan tanyakan seputar informasi produk, atau ketik **'Mau Order'** untuk melakukan pemesanan langsung secara otomatis ke sistem kami.", false);
   </script>
 </body>
 </html>

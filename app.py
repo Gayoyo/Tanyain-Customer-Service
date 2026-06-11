@@ -1,3 +1,4 @@
+import os
 from flask import Flask, render_template, request, jsonify, redirect, url_for, flash, session, Response, send_file
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
@@ -18,7 +19,7 @@ from io import BytesIO # <--- Ditambahkan agar fungsi generate_qr berfungsi
 # KONFIGURASI WEBHOOK UNTUK INTEGRASI FASE II (SSOT)
 # PASTIKAN INI DIGANTI DENGAN URL ASLI MAKE.COM ANDA!
 # ====================================================================
-WEBHOOK_MAKE_COM_URL = "https://hook.eu1.make.com/[PASTE_URL_WEBHOOK_MAKE_COM_DI_SINI]" 
+WEBHOOK_MAKE_COM_URL = os.environ.get("MAKE_WEBHOOK_URL", "https://hook.eu1.make.com/[PASTE_URL_WEBHOOK_MAKE_COM_DI_SINI]") 
 
 class RoleEnum(enum.Enum):
     client = "client"
