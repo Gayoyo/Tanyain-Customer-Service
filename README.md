@@ -64,3 +64,13 @@ MAKE_WEBHOOK_URL=[https://hook.us1.make.com/your_webhook_id](https://hook.us1.ma
 4. Run Application
 python app.py
 Access the application at http://127.0.0.1:5000/.
+
+👤 Role Access Matrix
+-Super Admin (/superadmin): Review, verify, and approve newly registered business merchant accounts.
+
+-Client / Merchant (/dashboard): Manage FAQ knowledge base (CRUD/CSV Upload), view chat analytics, and download dynamic store QR codes.
+
+-End User / Customer (/chat/<tenant_slug>): Public chat interface for instant AI support and automated order placement.
+
+📜 License & Author
+Developed with ❤️ by Rizky Juni Arigayo
